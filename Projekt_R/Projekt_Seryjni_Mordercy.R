@@ -54,3 +54,39 @@ barplot(top10_nazwisk$ofiary,
         main = "Top 10 morderców z największą liczbą udowodnionch zabójstw",
         ylab = "Liczba wykazanych ofiar")
 dev.off()
+#metody zabijania ####
+(uduszenia <- sum(grepl("strangl|choke|suffocat", wszyscy$Notes, ignore.case = TRUE)))
+(zastrzelenia<- sum(grepl("shoot|shot|gun|rifle", wszyscy$Notes, ignore.case = TRUE)))
+(zanozowanie<-sum(grepl("knife|stab|slit", wszyscy$Notes, ignore.case = TRUE)))
+(zatrucia<-sum(grepl("poison|arsenic|cyanide", wszyscy$Notes, ignore.case = TRUE)))
+(narzedzia<-sum(grepl("bludgeon|hammer|rock|brick|beat", wszyscy$Notes, ignore.case = TRUE)))
+
+metody<-data.frame(Metoda = c("Uduszenie", "Zastrzelenie", "Zanożowanie", "Zatrucie", "Użycie narzedzi tępych"),
+                   Liczba_Mordercow = c(uduszenia, zastrzelenia, zanozowanie, zatrucia, narzedzia))
+metody<-metody[order(metody$Liczba_Mordercow, decreasing = TRUE),]
+write_xlsx(metody, "Najpopularniejsze_metody_zabijania.xlsx")
+png("Wykres_Metod.png", width = 800, height = 600)
+par(mar = c(12, 5, 4, 2))
+barplot(metody$Liczba_Mordercow,
+        names.arg = metody$Metoda,
+        las = 2,
+        col = "green",
+        main = "Najchętniej używane metody",
+        ylab = "Liczba wykazanych ofiar")
+dev.off()
+#mistrzowie w uciekaniu przed sprawiedliwoscia
+wszyscy$Ostatni_rok<- as.numeric(stri_extract_last_regex(wszyscy$Years.active, "[0-9]{4}"))
+wszyscy$Lata_Bez_Kary<- wszyscy$Ostatni_rok-wszyscy$Pierwszy_rok + 1
+czas<- wszyscy[!is.na(wszyscy$Lata_Bez_Kary), ]
+rekordzisci<-czas[order(czas$Lata_Bez_Kary, decreasing = TRUE), ]
+bezkarni<-head(rekordzisci[, c("Name", "Pierwszy_rok", "Ostatni_rok", "Lata_Bez_Kary")], 10)
+write_xlsx(bezkarni, "Najdluzsza_kariera.xlsx")
+png("Wykres_Bezkarni.png", width = 800, height = 600)
+par(mar = c(12, 5, 4, 2))
+barplot(bezkarni$Lata_Bez_Kary,
+        names.arg = bezkarni$Name,
+        las = 2,
+        col = "pink",
+        main = "Najdłuższe kariery",
+        ylab = "Lata bezkarności")
+dev.off()
