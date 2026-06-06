@@ -86,7 +86,26 @@ par(mar = c(12, 5, 4, 2))
 barplot(bezkarni$Lata_Bez_Kary,
         names.arg = bezkarni$Name,
         las = 2,
-        col = "pink",
+        col = "navy",
         main = "Najdłuższe kariery",
         ylab = "Lata bezkarności")
 dev.off()
+
+# szukanie kobiet morderczyn
+wszyscy$Kobieta<-grepl("\\b(she|her|mother|wife|widow|woman|priestess|female)\\b",
+                       wszyscy$Notes, ignore.case = TRUE)
+Kobiety<-wszyscy[wszyscy$Kobieta==TRUE, ]
+Kobiety<-Kobiety[!is.na(Kobiety$ofiary),]
+top_Kobiety<-Kobiety[order(Kobiety$ofiary, decreasing = TRUE), ]
+topka_kobiet<-head(top_Kobiety[, c("Name", "Country", "ofiary")], 10)
+write_xlsx(topka_kobiet, "Top10_Kobiet.xlsx")
+png("Wykres_Kobiety.png", width = 800, height = 600)
+par(mar = c(12, 5, 4, 2))
+barplot(topka_kobiet$ofiary,
+        names.arg = topka_kobiet$Name,
+        las = 2,
+        col = "pink",
+        main = "Najwięcej zabójstw",
+        ylab = "Liczba zabójstw")
+dev.off()
+#chuj wie czy to dobrze w sensie czy serio same baby ale chuj
